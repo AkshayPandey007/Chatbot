@@ -1,0 +1,57 @@
+name: Eningo portal build and push to ECR
+
+on:
+  push:
+    branches: 
+      - main
+      - development
+  pull_request:
+    branches: 
+      - main
+
+env:
+  VERSION_TAG: ""
+  LATEST_TAG: "latest"
+  AWS_REGION: eu-north-1
+  ECR_REPOSITORY: eningo-dig-portal
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Get latest Git tag
+      id: get-latest-tag
+      run: echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
+
+    - name: Increment version number
+      id: increment-version
+      run: echo "::set-output name=version::$(echo ${{ steps.get-latest-tag.outputs.tag }} | awk -F. -v OFS=. '{$NF++;print}')"
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container end
+        # push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.increment-version.outputs.version }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.increment-version.outputs.version }}
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.increment-version.outputs.version }}" >> $GITHUB_OUTPUT
