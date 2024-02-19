@@ -78,6 +78,7 @@ const ChatItem = ({
             )
           )}
       </Box>
+      <div ref={messagesEndRef}></div>
     </Box>
   ) : (
     <Box

@@ -23,13 +23,13 @@ body {
   letter-spacing: 1px;
 }
 
-.DailogBox .css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+.DailogBox .css-1t1j96h-MuiPaper-root-MuiDialog-paper,.DailogBox .css-uhb5lp {
   /* Your custom styles here */
   // padding: 10px !important;
-  border: 1px solid white;
-  box-shadow: -5px -5px 105px #64f3d5;
+  border: 1px solid white !important;
+  box-shadow: -5px -5px 105px #64f3d5 !important;
   color:white !important;
-  border-radius: 15px;
+  border-radius: 15px !important;
   /* Add more styles as needed */
 }
 
