@@ -225,7 +225,7 @@ const Chatbot = ({open,setOpen}:{open:boolean,setOpen:Function}) => {
             ref={chatContainerRef}
           >
             {
-          chat.length > 0 ?
+          chat?.length > 0 ?
             chat?.map((item: any, index: number) => (
               //@ts-ignore
               <ChatItem content={item?.content} role={item?.role} key={index} />
